@@ -203,6 +203,27 @@ console.log('After everything');2
 
 
 //coforge
+function allSettled(arr) {
+  return Promise.all(
+    arr.map(item =>
+      Promise.resolve(item)
+        .then(value => ({
+          status: 'fulfilled',
+          value
+        }))
+        .catch(reason => ({
+          status: 'rejected',
+          reason
+        }))
+    )
+  );
+}
+// allSettled([
+// Promise.resolve(1),
+// Promise.reject('error'),
+// 42
+// ]).then((r) => console.log(r));
+
 function debounce(fn, delay){
   let timeout;
   return function(...arg){

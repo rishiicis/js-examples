@@ -1,0 +1,74 @@
+  <!DOCTYPE html>
+  <html>
+
+  <head>
+    <title>Load More Item </title>
+  </head>
+
+  <body>
+    <input type="text" id="inputBox" placeholder="Search meal ..." />
+    <ul id="list"></ul>
+
+  <script>  
+  const inputBox = document.getElementById("inputBox");
+  const list = document.getElementById("list");
+  const cache = {};
+  
+  function debounce(fn, delay){
+    let timer;
+    return function(...arg){
+      clearTimeout(timer);
+      timer = setTimeout(()=>{
+        fn(...arg)
+      }, delay)
+    }
+  }
+
+  const handleSearch = async(val) =>{
+    const v = val.toLowerCase();
+
+    if(v.trim() === ""){
+      list.innerHTML = "";
+      return;
+    }
+
+    if(cache[v]){
+      displayMeal(cache[v]);
+      console.log("cached")
+      return;
+    }
+
+    try{
+      const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${v}`);
+      const data = await res.json();
+      let mealData = data.meals || [];
+      cache[v] = mealData;
+      console.log(mealData);
+      displayMeal(mealData)
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+
+  const displayMeal =(meal)=>{
+    list.innerHTML = "";
+    meal.forEach(c => {
+      const li = document.createElement("li");
+      li.textContent = c.strMeal;
+      list.appendChild(li);
+    })
+  }
+
+  const debounceSearch = debounce((e)=>{
+    handleSearch(e.target.value);
+  }, 500)
+
+  inputBox.addEventListener("input", debounceSearch);
+
+  </script>
+
+
+  </body>
+
+  </html>

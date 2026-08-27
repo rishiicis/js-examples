@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>filter user</title>
+</head>
+
+<body>
+<input type="text" id="textBox" placeholder="Search uesrs..."/>
+<select id="selected">
+  <option value="all">All</option>
+  <option value="Admin">Admin</option>
+  <option value="User">User</option>
+  <option value="Editor">Editor</option>
+</select>
+
+<div id="wrapper"></div>
+
+<script>
+const wrapper = document.getElementById("wrapper");
+const textBox = document.getElementById("textBox");
+const selected = document.getElementById("selected");
+const users = [
+  { id: 1, name: "Rishi", role: "Admin" },
+  { id: 2, name: "Bhooshan", role: "User" },
+  { id: 3, name: "Mike", role: "admin" },
+  { id: 4, name: "Johnson", role: "User" },
+  { id: 5, name: "Mike Johnson", role: "Editor" },
+];
+
+const filtered = (userRole, userName)=>{
+  // if(userRole === "all"){
+  //   displayUser(users);
+  //   return;
+  // }
+  const filteredUser = users.filter(u =>{
+    const byRole = userRole === "all" || u.role.toLowerCase() === userRole.toLowerCase()
+    const byName = u.name.toLowerCase().includes(userName.toLowerCase());
+    return byName && byRole ;
+  });
+  displayUser(filteredUser)
+}
+
+const displayUser = (data)=>{
+  wrapper.innerHTML = "";
+  data.forEach(u => {
+    const p = document.createElement("p");
+    p.innerHTML = `id: ${u.id}, Name: ${u.name}, id: ${u.role}`;
+    wrapper.appendChild(p);
+  });
+}
+
+selected.addEventListener("change", ()=>{
+  filtered(selected.value, textBox.value);
+})
+
+textBox.addEventListener("input", (e)=>{
+  filtered(selected.value, textBox.value);
+})
+
+filtered("all", "");
+
+
+</script>
+</body>
+</html>

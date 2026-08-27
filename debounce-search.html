@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Debounce search</title>
+</head>
+<body>
+<div class="container">
+    <input type="text" placeholder="search ..." id="searchBox">
+    <ul class="list"></ul>
+</div>
+<script>
+//Gave a scenario of slowness where it is a website selling cakes. 
+// Based on the entry in the input field , the matching cakes will be picked. 
+// The js method used is find. How to reduce the slowness in this scenario?
+const list = document.querySelector(".list");
+const searchBox = document.getElementById("searchBox");
+const cakes = ["vanila", "choco", "pinaple", "cake4", "cake5"];
+
+const debounce = (fn, delay)=>{
+    let timer;
+    return (...arg)=>{
+        clearTimeout(timer);
+        timer = setTimeout(()=>{
+            fn(...arg);
+        }, delay)
+    }
+}
+
+const handleSearch = (val)=> {
+    if(val.trim() === ""){
+        list.innerHTML="";
+        return;
+    };
+
+    const filtered = cakes.filter((c)=> 
+        c.toLowerCase().includes(val.toLowerCase())
+    )
+    list.innerHTML ="";
+    filtered.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+    })
+
+}
+const debounceSearch = debounce((e)=>{
+    handleSearch(e.target.value);
+},500);
+
+searchBox.addEventListener("input", debounceSearch);
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Edit Comment in line</title>
+</head>
+
+<body>
+<div id="wrapper"></div>
+
+<script>
+//fetch edit save cancel comment 
+const wrapper = document.getElementById("wrapper");
+let commentData = [];
+let editId = null;
+
+const getComments = async()=>{
+  try{
+    const res = await fetch("https://dummyjson.com/posts/1/comments?limit=3");
+    const data = await res.json();
+    commentData = data.comments;
+    renderComment();
+  }
+  catch(err){
+    wrapper.innerHTML = `Error: ${err.message}`;
+  }
+}
+
+const renderComment = ()=>{
+  wrapper.innerHTML = "";
+
+  commentData.forEach(c => {
+    const div = document.createElement("div");
+
+    if(editId === c.id){
+      div.innerHTML = `<strong>${c.user.fullName}</strong> <br>`;
+      
+      const input = document.createElement("textarea");
+      input.value = c.body;
+      input.rows = 3;
+      input.cols = 50;
+
+      const save = document.createElement("button");
+      save.textContent = "Save";
+      const cancel = document.createElement("button");
+      cancel.textContent ="Cancel";
+
+      save.addEventListener("click", (e)=>{
+        //Prevent accidental edit when clicking Save/Cancel
+        // e.stopPropagation();
+        c.body = input.value;
+        editId = null;
+        renderComment();
+      })
+
+      cancel.addEventListener("click", (e)=>{
+        // e.stopPropagation(); 
+        editId = null;
+        renderComment();
+      })
+
+      div.append(input, save, cancel);
+    }
+
+    else{
+      div.innerHTML = `<strong>${c.user.fullName}</strong> <br>${c.body}`;
+      div.addEventListener("click", ()=>{
+        editId = c.id;
+        renderComment();
+      })
+    }
+
+    wrapper.appendChild(div);
+  })
+}
+
+getComments();
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Exp</title>
+  
+</head>
+
+<body>
+<div id="container"></div>
+<button id="prevBtn">Previous</button>
+  <span id="info"></span>
+<button id="nextBtn">Next</button>
+<script>
+const container = document.getElementById("container");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+const info = document.getElementById("info");
+
+let data = [];
+let visible = 0;
+const nextLoad = 10;
+
+const fetchData = async () => {
+  try {
+    const res = await fetch("https://jsonplaceholder.typicode.com/todos");
+    data = await res.json();
+    render();
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const render = () => {
+  const items = data.slice(visible, visible + nextLoad);
+  
+  container.innerHTML = items.map((item, index) => 
+    `<p>${index + 1 + visible}. ${item.title}</p>`
+  ).join("");
+  
+  // Disable buttons when needed
+  prevBtn.disabled = visible === 0;
+  nextBtn.disabled = visible + nextLoad >= data.length;
+ 
+  info.textContent = `${visible + nextLoad} of ${data.length}`;
+};
+
+nextBtn.addEventListener("click", () => {
+  visible += nextLoad;
+  render();
+});
+
+prevBtn.addEventListener("click", () => {
+  visible -= nextLoad;
+  render();
+});
+
+fetchData();
+</script>
+</body>
+</html>   

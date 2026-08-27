@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Comments</title>
+  <style>
+    body { font-family: Arial; }
+    .comment { padding: 8px; border-bottom: 1px solid #ccc; cursor: pointer; }
+    .editing { background: #f5f5f5; display: flex; align-items: center; gap: 8px;}
+    input { flex: 1; padding: 4px; }
+    button { padding: 4px 8px; }
+  </style>
+</head>
+<body>
+  <div id="wrapper"></div>
+  <button id="loadMore">Load More</button>
+
+<script>
+  const wrapper = document.getElementById("wrapper");
+  const info = document.getElementById("info");
+  const loadMore = document.getElementById("loadMore");
+  let limit = 5;
+  let skip = 0;
+  let editid = null;
+  let allTodos = [];
+
+const getData = async ()=>{
+  try{
+    const res= await fetch(`https://dummyjson.com/todos?limit=${limit}&skip=${skip}`);
+    if(!res.ok){
+      throw new Error(`Server Error ${res.status}`);
+    }
+    const data = await res.json();
+    console.log(data);
+    allTodos.push(...data.todos)
+    displayTodo(allTodos);
+    skip += limit;
+  }
+  catch(err){
+    wrapper.innerHTML = `Error: ${err.message}`;
+  }
+}
+
+const displayTodo = (todos)=>{
+  wrapper.innerHTML ="";
+  todos.forEach(t => {
+    const div = document.createElement("div");
+    if(editid === t.id){
+      const input = document.createElement("textarea");
+      input.cols = 100;
+      input.value = t.todo;
+      const save = document.createElement("button");
+      save.textContent = "Save";
+      const cancel = document.createElement("button");
+      cancel.textContent="Cancel";
+
+      save.addEventListener("click",()=>{
+        t.todo = input.value;
+        editid = null;
+        displayTodo(allTodos);
+      })
+
+      cancel.addEventListener("click", ()=>{
+        editid = null;
+        displayTodo(allTodos);
+      })
+      div.append(input, save, cancel);
+    }
+    else{
+      div.textContent = `id-${t.id}: ${t.todo}`;
+      div.addEventListener("click", ()=>{
+        editid = t.id;
+        displayTodo(allTodos);
+      })
+    }
+    wrapper.appendChild(div);
+  })
+
+}
+
+loadMore.addEventListener("click", getData);
+
+getData();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Todos by UserId</title>
+  <style>
+    *{box-sizing: border-box;}
+    #container{display: flex; flex-wrap: wrap; gap: 15px;}
+    .completed{color:green}
+    .userBlock{border: 1px solid; flex:0 0 calc(33.33% - 15px); height: 250px; overflow-y: auto;}
+  </style>
+</head>
+<body>
+
+<div id="container"></div>
+
+<script>
+const container = document.getElementById("container");
+const getTodos= async ()=> {
+try {
+const res = await fetch("https://jsonplaceholder.typicode.com/todos");
+const data = await res.json();
+// Get unique userIds using map + Set
+const userIds = [...new Set(data.map(item => item.userId))];
+
+userIds.forEach(uId => {
+    const userTodos = data.filter(item => item.userId === uId);
+    // console.log(userTodos);
+    const block = document.createElement("div");
+    block.className = "userBlock";
+
+    const h2 = document.createElement("h2");
+    h2.textContent = `User ID: ${uId}`;
+    block.appendChild(h2);
+
+    const ul = document.createElement("ul");
+    userTodos.forEach(todo => {
+        const li = document.createElement("li");
+        li.textContent = todo.title;
+        li.className = todo.completed ? "completed" : "na";
+        
+        
+        // click to toggle
+        li.addEventListener("click", () => {
+          li.classList.toggle("completed");
+          li.classList.toggle("na");
+        });
+
+        ul.appendChild(li);
+        // ul.innerHTML += `<li class="${todo.completed ? "completed" : "na"}"> ${todo.title} </li>`;
+    });
+    
+    block.appendChild(ul);
+    container.appendChild(block);
+});
+
+} 
+catch (error) {
+    console.error("Error:", error.message);
+}
+}
+
+getTodos();
+</script>
+
+</body>
+</html>

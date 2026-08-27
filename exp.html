@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Js Example</title>
+</head>
+
+<body>
+<style>.block{border: 1px solid; margin-bottom: 10px;}</style>
+<input type="text" id="query"  placeholder="query..."/>
+<input type="text" id="category" placeholder="category..."/>
+<input type="text" id="brand" placeholder="brand..."/>
+<input type="text" id="title" placeholder="title..."/>
+<button id="search" >Search</button>
+
+<div id="wrapper"></div>
+
+<script>
+  
+
+  const wrapper = document.getElementById("wrapper");
+  const btn = document.getElementById("search");
+  
+  const getProduct = async()=>{
+    const query = document.getElementById("query").value;
+    const category = document.getElementById("category").value;
+    const brand = document.getElementById("brand").value;
+    const title = document.getElementById("title").value;
+    try{
+      const res = await fetch(`https://dummyjson.com/products/search?limit=125&q=${query}`);
+      const data = await res.json();
+      let productList = data.products || [];
+
+      if(category){
+        productList = productList.filter(p => p.category?.toLowerCase().includes(category.toLowerCase()));
+      }
+      
+      if(brand){
+        productList = productList.filter(p => p.brand?.toLowerCase().includes(brand.toLowerCase()));
+      }
+
+      if(title){
+        productList = productList.filter(p => p.brand?.toLowerCase().includes(brand.toLowerCase()));
+      }
+
+      render(productList);
+    }
+    catch(err){
+      console.log(err.message);
+    }
+  }
+  
+  const render = (products)=>{
+    wrapper.innerHTML = "";
+    if(products.length === 0){
+      wrapper.innerHTML = `<h3>No Product Found</h3>`;
+      return;
+    }
+    products.forEach(p =>{
+      const div = document.createElement("div");
+      div.classList.add("block");
+      const h3 = document.createElement("h3");
+      const p1 = document.createElement("p");
+      const p2 = document.createElement("p");
+      const h4 = document.createElement("h4");
+
+      h3.textContent = p.title;
+      p1.textContent = p.brand;
+      p2.textContent = p.category;
+      h4.textContent = p.price;
+
+      div.append(h3, p1, p2, h4);
+      wrapper.appendChild(div);
+    })
+  }
+
+  btn.addEventListener("click", getProduct)
+
+</script>
+</body>
+</html>

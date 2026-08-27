@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Load More Item </title>
+<style>
+*{margin: 0; padding: 0; box-sizing: border-box;}
+.Container{max-width: 1200px; margin: 0 auto;}
+table{width: 100%;text-align: left; }
+</style>
+</head>
+<body>
+   <div class="Container">
+    <h1 id="itemInfo"></h1>
+    <table>
+        <thead>
+            <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody id="dataWraper"></tbody>
+    </table>
+    <button id="loadMore">Load More</button>
+   </div> 
+
+<script>
+//https://dummy-json.mock.beeceptor.com/comments
+//use api url and display all item in table
+//initally load 10 item, per click 2 item, displayed and total item, try catch no rerender use javascript
+const info = document.getElementById("itemInfo");
+const wraper = document.getElementById("dataWraper");
+const loadMoreBtn = document.getElementById("loadMore");
+
+const initiaLoad = 10;
+const nextLoad = 5;
+let visibleItem = 0;
+let data = [];
+
+const fetchData = async () =>{
+    try{
+        const res = await fetch("https://dummy-json.mock.beeceptor.com/comments");
+        data = await res.json()
+        console.log(data);
+        displayData(initiaLoad)
+    }
+    catch(err){
+        console.log(err);
+        info.innerHTML = "Failed to load data";
+    }
+}
+
+function displayData(count){
+    const items = data.slice(visibleItem, visibleItem + count);
+    visibleItem += items.length;
+
+    items.forEach(item => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${item.id}</td>
+        <td>${item.name}</td>
+        <td>${item.email}</td>
+        <td>${item.body}</td>`;
+      wraper.appendChild(tr);
+    })
+    
+    // wraper.innerHTML += items.map(item => 
+    //     `<tr>
+    //         <td>${item.id}</td>
+    //         <td>${item.name}</td>
+    //         <td>${item.email}</td>
+    //         <td>${item.body}</td>
+    //     </tr>`
+    // ).join("");
+
+    info.innerHTML = `${visibleItem} of ${data.length}`;
+
+    if(visibleItem >= data.length){
+        loadMoreBtn.setAttribute("disabled", true);
+        loadMoreBtn.textContent = "No more Data";
+    }
+
+}
+
+
+loadMoreBtn.addEventListener("click", ()=> displayData(nextLoad))
+
+fetchData();
+
+</script>
+</body>
+</html>
